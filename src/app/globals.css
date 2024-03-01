@@ -50,6 +50,41 @@
   }
 }
 
+/* custom scrollbar */
+::-webkit-scrollbar{
+  width: 8px;
+}
+
+/* track */
+::-webkit-scrollbar-track{
+  background: #1771c6;
+}
+
+/* handle */
+::-webkit-scrollbar-thumb{
+  background: #f5f5f5b0;
+}
+
+/* handle on hover */
+::-webkit-scrollbar-thumb:hover{
+  background: #32ae7e;
+}
+
+/* for Chrome, Safari, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* for Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+}
  
 @layer base {
   * {
@@ -58,4 +93,30 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-2px);
+  }
+  40% {
+    transform: translateX(2px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
 }

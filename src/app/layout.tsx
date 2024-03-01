@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils"
 import { ReduxProvider } from "./ReduxProvider";
+import Header from "@/components/ui/header/Header";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
         )}
       >
         <ReduxProvider>
+          <Header />
           {children}
         </ReduxProvider>
       </body>

@@ -9,9 +9,9 @@ export default function Home() {
   const dispatch = useDispatch()
   return (
     <div>
-      <Button onClick={
+      {/* <Button onClick={
         () => dispatch(userLoggedIn({accessToken:"lsnfklnfwbgwjgwle", user:"goodluck"}))
-      }>Hello</Button>
+      }>Hello</Button> */}
     </div>
   );
 }
