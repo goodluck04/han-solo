@@ -1,10 +1,9 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  accessToken: "",
-  refreshToken: "",
+  // accessToken: "",
   user: "",
-  token:""
+  token: "",
 };
 
 const authSlice = createSlice({
@@ -14,16 +13,11 @@ const authSlice = createSlice({
     userLoggedIn: (state, action: PayloadAction<{ user: string }>) => {
       state.user = action.payload.user;
     },
-    setCredentials: (
-      state,
-      action: PayloadAction<{ accessToken: string; refreshToken: string }>
-    ) => {
-      state.accessToken = action.payload.accessToken;
-      state.refreshToken = action.payload.refreshToken;
+    setCredentials: (state, action: PayloadAction<{ accessToken: string }>) => {
+      state.token = action.payload.accessToken;
     },
     userLoggedOut: (state) => {
-      state.accessToken = "";
-      state.refreshToken = "";
+      state.token = "";
       state.user = "";
     },
   },

@@ -1,21 +1,25 @@
 
-import { Button } from "../button";
-import { useState } from "react";
+import { Button } from "../ui/button";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./CustomDialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "../CustomDialog";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../form";
-import { Input } from "../input";
-import { Avatar, AvatarFallback, AvatarImage } from "../avatar";
-import { RouteType } from "./Header";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import AvatarHolder from "@/components/AvatarHolder";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
+import { useSelector } from "react-redux";
+import { RouteType } from "../header/Header";
+import { toast } from "sonner";
+import { ButtonLoading } from "../LoadingButton";
 
 type Props = {
     open: boolean;
     route: string;
-    setRoute: (route:RouteType) => void;
+    setRoute: (route: RouteType) => void;
     setOpen: (open: boolean) => void;
 };
 
@@ -33,6 +37,8 @@ type UserFormData = z.infer<typeof formSchema>;
 
 export default function LoginModel({ open, setRoute, setOpen }: Props) {
 
+    const [login, { isLoading, data, error, isSuccess }] = useLoginMutation();
+
     const form = useForm<UserFormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -41,17 +47,40 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
-        setRoute("Register");
-
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        // console.log(values)
+        await login(values)
     }
 
     const handleToggle = () => {
         setOpen(!open)
     };
+
+    const forgetPasswordHandler = () => {
+        setRoute("ForgetPassword");
+    }
+
+    const registerRedirectHandler = () => {
+        setRoute("Register");
+    }
+
+    useEffect(() => {
+        if (isSuccess) {
+            setOpen(false);
+            toast.success("Login Successfully");
+            // reftch user
+
+        }
+        if (error) {
+            if ("data" in error) {
+                const errorData = error as any;
+                toast.error(errorData.data.message);
+            } else {
+                console.log("[LOGIN_ERROR]:", error)
+            }
+        }
+    }, [isSuccess, error]);
+
 
 
     return (
@@ -67,7 +96,6 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                         <div>
                             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                                 <FormField
-
                                     control={form.control}
                                     name="email"
                                     render={({ field }) => (
@@ -81,7 +109,6 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                                     )}
                                 />
                                 <FormField
-
                                     control={form.control}
                                     name="password"
                                     render={({ field }) => (
@@ -96,7 +123,7 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                                 />
                                 <div className="">
                                     <div className="text-end  -mt-8  text-red-500">
-                                        <p className="hover:underline cursor-pointer">forgotten password ?</p>
+                                        <p onClick={forgetPasswordHandler} className="hover:underline cursor-pointer">forgotten password ?</p>
                                     </div>
                                     <div className="font-bold text-center text-slate-500  underline">OR</div>
                                     <div className="flex justify-center my-2 gap-12">
@@ -104,11 +131,11 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                                         <AvatarHolder src="https://github.com/shadcn.png" alt="Git" />
                                     </div>
                                     <div className="text-end -mb-8 text-red-500">
-                                        <p className="hover:underline cursor-pointer">Don&rsquo;t have an Account ?</p>
+                                        <p onClick={registerRedirectHandler} className="hover:underline cursor-pointer">Don&rsquo;t have an Account ?</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center w-full justify-center">
-                                    <Button className="w-full" type="submit"  >Sign Up</Button>
+                                    {isLoading ? <ButtonLoading /> : <Button className="w-full" type="submit"  >Sign Up</Button>}
                                 </div>
                             </form>
                         </div>

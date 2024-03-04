@@ -5,7 +5,9 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils"
 import { ReduxProvider } from "./ReduxProvider";
-import Header from "@/components/ui/header/Header";
+import { Toaster } from "@/components/ui/sonner";
+import Header from "@/components/header/Header";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -31,8 +33,16 @@ export default function RootLayout({
         )}
       >
         <ReduxProvider>
-          <Header />
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Header />
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </ReduxProvider>
       </body>
     </html>

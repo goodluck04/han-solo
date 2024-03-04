@@ -2,14 +2,15 @@ import {
   BaseQueryFn,
   FetchArgs,
   FetchBaseQueryError,
-  createApi,
-  fetchBaseQuery,
 } from "@reduxjs/toolkit/query";
 import { setCredentials, userLoggedOut } from "../auth/authSlice";
 import { RootState } from "@/redux/store";
 
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { userLoggedIn } from "../auth/authSlice";
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.BASE_URL!,
+  baseUrl: process.env.NEXT_PUBLIC_URL!,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const token = (getState() as RootState).auth.token;
@@ -37,8 +38,8 @@ const baseQueryWithReauth: BaseQueryFn<
   if (result.error && result.error.status === 401) {
     const refreshResult = await baseQuery(
       {
-        url: "token/refresh/",
-        method: "POST",
+        url: "/auth/refresh",
+        method: "GET",
       },
       api,
       extraOptions
@@ -48,9 +49,10 @@ const baseQueryWithReauth: BaseQueryFn<
       console.log(refreshResult.data);
       // api.dispatch(setCredentials({ accessToken,refreshToken }));
 
-      const { accessToken, refreshToken } = refreshResult.data as RefreshTokenResponse;
+      const { accessToken, refreshToken } =
+        refreshResult.data as RefreshTokenResponse;
 
-      api.dispatch(setCredentials({ accessToken, refreshToken }));
+      api.dispatch(setCredentials({ accessToken }));
 
       // retry the initial query
       result = await baseQuery(args, api, extraOptions);
@@ -59,15 +61,50 @@ const baseQueryWithReauth: BaseQueryFn<
       // if (refreshResult?.error?.status === 403) {
       //   refreshResult.error.data.message = 'Your login has expired.';
       // }
-    //   return refreshResult;
-    // }
+      //   return refreshResult;
+      // }
     }
   }
   return result;
 };
 
 export const baseApi = createApi({
-  reducerPath: "baseApi",
+  reducerPath: "api",
+  // baseQuery: fetchBaseQuery({
+  //     baseUrl: process.env.NEXT_PUBLIC_SERVER_URI,
+  // }),
   baseQuery: baseQueryWithReauth,
-  endpoints: () => ({}),
+  endpoints: (builder) => ({
+    // refreshToken: builder.query({
+    //     query: (data) => ({
+    //         url: "refresh",
+    //         method: "GET",
+    //         credentials: "include" as const,
+    //     })
+    // }),
+    // loader user
+    // loadUser: builder.query({
+    //     query: (data) => ({
+    //         url: "me",
+    //         method: "GET",
+    //         credentials: "include" as const,
+    //     }),
+    //     // give user info
+    //     async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+    //         try {
+    //             const result = await queryFulfilled;
+    //             dispatch(
+    //                 userLoggedIn({
+    //                     // accessToken: result.data.activationToken,
+    //                     user: result.data.user,
+    //                 })
+    //             )
+    //         } catch (error: any) {
+    //             console.log(error);
+    //         }
+    //     },
+    // }),
+  }),
 });
+
+export const {} = baseApi;

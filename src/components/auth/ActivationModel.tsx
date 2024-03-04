@@ -1,9 +1,14 @@
 
-import { Button } from "../button";
-import { useRef, useState } from "react";
-import { TvIcon, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./CustomDialog";
-import { RouteType } from "./Header";
+import { Button } from "../ui/button";
+import { useEffect, useRef, useState } from "react";
+import { ShieldCheck, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../CustomDialog";
+import { RouteType } from "../header/Header";
+import { useVerificationMutation } from "@/redux/features/auth/authApi";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
+import { ButtonLoading } from "../LoadingButton";
 
 type Props = {
     open: boolean;
@@ -22,6 +27,8 @@ type VerifyNumber = {
 export default function VerificationModel({ open, setRoute, setOpen, route }: Props) {
 
     const [invalidError, setInvalidErrror] = useState(false);
+    const [verification, { isLoading, isSuccess, error }] = useVerificationMutation()
+    const token = useSelector((action: RootState) => action.auth.token);
 
     const inputRef = [
         useRef<HTMLInputElement>(null),
@@ -37,21 +44,17 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
     })
 
     const verificationHandler = async () => {
-        // console.log("test")
-        // setInvalidErrror(true);
-
         const verificationNumber = Object.values(verifyNumber).join("");
         if (verificationNumber.length !== 4) {
             setInvalidErrror(true);
             return;
         }
-        // await activation({
-        //     activation_token: token,
-        //     activation_code: verificationNumber,
-        // })
-        // setOpen(false);
-
+        await verification({
+            activation_token: token,
+            activation_code: verificationNumber,
+        })
     };
+
 
     const handleInputChange = (index: number, value: string) => {
 
@@ -70,6 +73,22 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
         setOpen(!open)
     };
 
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Account activated successfully");
+            setRoute("Login");
+        };
+        if (error) {
+            if ("data" in error) {
+                const errorData = error as any;
+                setInvalidErrror(true);
+                toast.error(errorData.data.message);
+            } else {
+                console.log("[VERIFICATION_ERROR]:", error)
+            }
+        }
+    }, [isSuccess, error, setInvalidErrror]);
+
     return (
         <Dialog open={open}>
             <DialogTrigger className="hidden" onClick={handleToggle}></DialogTrigger>
@@ -81,8 +100,8 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
                 <DialogHeader>
                     <div className="">
                         <div className="flex flex-col justify-center">
-                            <p className="my-4 text-center text-wrap">Check your email</p>
-                            <TvIcon className="w-12 h-12 my-2 text-red-300 self-center" />
+                            <p className="my-4 text-center text-wrap">We have sent you OTP on registered email.Check your email inbox and spam.</p>
+                            <ShieldCheck className="w-12 h-12 my-2 text-green-400 self-center" />
                         </div>
                         <div className="flex container gap-1 items-center justify-center">
                             {Object.keys(verifyNumber).map((key, index) => (
@@ -101,7 +120,7 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
                         <div>
                         </div>
                         <div className="flex items-center w-full justify-center">
-                            <Button className="sm:w-full w-[80%] mt-4" type="submit" onClick={verificationHandler} >Sign Up</Button>
+                            {isLoading ? <ButtonLoading /> : <Button className="sm:w-full w-[80%] mt-4" type="submit" onClick={verificationHandler} >Sign Up</Button>}
                         </div>
                     </div>
                 </DialogHeader>

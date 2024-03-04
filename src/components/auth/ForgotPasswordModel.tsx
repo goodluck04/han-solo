@@ -1,16 +1,16 @@
 
 
 
-import { Button } from "../button";
+import { Button } from "../ui/button";
 import { useRef, useState } from "react";
 import { TvIcon, X } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./CustomDialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../form";
-import { Input } from "../input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../CustomDialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
+import { Input } from "../ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { RouteType } from "./Header";
+import { RouteType } from "../header/Header";
 
 type Props = {
     open: boolean;
@@ -78,7 +78,6 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
         //     activation_code: verificationNumber,
         // })
         // setOpen(false);
-        setRoute("ForgetPassword");
     };
 
     const handleInputChange = (index: number, value: string) => {
