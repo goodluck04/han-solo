@@ -8,13 +8,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import AvatarHolder from "@/components/AvatarHolder";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { useSelector } from "react-redux";
 import { RouteType } from "../header/Header";
 import { toast } from "sonner";
 import { ButtonLoading } from "../LoadingButton";
+import OAuth from "./OAuth";
+
 
 type Props = {
     open: boolean;
@@ -125,11 +124,16 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                                     <div className="text-end  -mt-8  text-red-500">
                                         <p onClick={forgetPasswordHandler} className="hover:underline cursor-pointer">forgotten password ?</p>
                                     </div>
-                                    <div className="font-bold text-center text-slate-500  underline">OR</div>
-                                    <div className="flex justify-center my-2 gap-12">
-                                        <AvatarHolder src="https://github.com/shadcn.png" alt="G+" />
-                                        <AvatarHolder src="https://github.com/shadcn.png" alt="Git" />
-                                    </div>
+                                    <div className="font-bold text-center text-slate-500  underline">Or join with</div>
+                                    {/* <div className="flex justify-center my-6 gap-8 ">
+                                            <FcGoogle
+                                                onClick={() => signIn("google")}
+                                                size={30} className="cursor-pointer mr-2 hover:opacity-70" />
+                                            <AiFillGithub
+                                                onClick={() => signIn("github")}
+                                                size={30} className="cursor-pointer ml-2 hover:opacity-70" />
+                                    </div> */}
+                                    <OAuth setOpen={setOpen} />
                                     <div className="text-end -mb-8 text-red-500">
                                         <p onClick={registerRedirectHandler} className="hover:underline cursor-pointer">Don&rsquo;t have an Account ?</p>
                                     </div>

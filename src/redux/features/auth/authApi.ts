@@ -29,26 +29,26 @@ type RegistrationData = {};
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation({
-      query: (credentials) => ({
+      query: ({ email, phone, password }) => ({
         url: "/auth/register",
         method: "POST",
-        body: { ...credentials },
+        body: { email, phone, password },
       }),
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           console.log(data);
           dispatch(setCredentials({ accessToken: data.activationToken }));
-        } catch (err) {
-          console.log("[LOGIN_SET_CREDENTIALS_ERROR]:", err);
+        } catch (error) {
+          console.log("[REGISTER_API_ERROR]:", error);
         }
       },
     }),
     verification: builder.mutation({
-      query: (credentials) => ({
+      query: ({ activation_code, activation_token }) => ({
         url: "/auth/activation",
         method: "POST",
-        body: { ...credentials },
+        body: { activation_code, activation_token },
       }),
     }),
     login: builder.mutation<LoginResponse, LoginRequest>({
@@ -71,8 +71,8 @@ export const authApi = baseApi.injectEndpoints({
           setTimeout(() => {
             dispatch(baseApi.util.resetApiState());
           }, 1000);
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          console.log("[LOGOUT_API_ERROR]:", error);
         }
       },
     }),
@@ -88,10 +88,33 @@ export const authApi = baseApi.injectEndpoints({
           // console.log(data);
           const { accessToken } = data;
           dispatch(setCredentials({ accessToken }));
-        } catch (err) {
-          console.log(err);
+        } catch (error) {
+          console.log("[REFRESH_TOKEN_API_ERROR]:", error);
         }
       },
+    }),
+    forgotPassword: builder.mutation({
+      query: ({ email }) => ({
+        url: "/auth/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log(data);
+          dispatch(setCredentials({ accessToken: data.activationToken }));
+        } catch (error) {
+          console.log("[FORGOT_PASSWORD_API_ERROR]:", error);
+        }
+      },
+    }),
+    changePassword: builder.mutation({
+      query: ({ activation_token, activation_code, newPassword }) => ({
+        url: "/auth/change-password",
+        method: "POST",
+        body: { activation_code, activation_token, newPassword },
+      }),
     }),
   }),
 });
@@ -101,4 +124,6 @@ export const {
   useLogoutMutation,
   useRegisterMutation,
   useVerificationMutation,
+  useForgotPasswordMutation,
+  useChangePasswordMutation,
 } = authApi;

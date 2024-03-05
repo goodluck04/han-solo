@@ -19,10 +19,12 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import AvatarHolder from "../AvatarHolder"
 
+type Props = {
+    setOpen: (open: boolean) => void;
+}
 
-
-export function MobileNav() {
-    const [open, setOpen] = useState(false);
+export function MobileNav({ setOpen }: Props) {
+    // const [open, setOpen] = useState(false);
     const user = useSelector((action: RootState) => action.auth.user);
 
     return (

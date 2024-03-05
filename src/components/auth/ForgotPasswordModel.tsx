@@ -2,8 +2,8 @@
 
 
 import { Button } from "../ui/button";
-import { useRef, useState } from "react";
-import { TvIcon, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ShieldCheck, TvIcon, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../CustomDialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
@@ -11,6 +11,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RouteType } from "../header/Header";
+import { useChangePasswordMutation, useForgotPasswordMutation } from "@/redux/features/auth/authApi";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
+import { ButtonLoading } from "../LoadingButton";
 
 type Props = {
     open: boolean;
@@ -28,8 +33,8 @@ type VerifyNumber = {
 
 
 const formSchemaEmail = z.object({
-    email: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
+    email: z.string().email().min(2, {
+        message: "email must be at least 2 characters.",
     }),
 
 })
@@ -50,35 +55,22 @@ type UserFormDataPassword = z.infer<typeof formSchemaPassword>;
 export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: Props) {
 
     const [invalidError, setInvalidErrror] = useState(false);
-
+    const [forgotPassord, { isLoading: forgotLoading, isSuccess: forgotSuccess, data: forgotData, error: forgotError }] = useForgotPasswordMutation();
+    const [changePassword, { isLoading, isSuccess, data, error }] = useChangePasswordMutation();
+    const { token } = useSelector((state: RootState) => state.auth)
     const inputRef = [
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null),
     ];
+
     const [verifyNumber, setVerifyNumber] = useState<VerifyNumber>({
         0: "",
         1: "",
         2: "",
         3: "",
     })
-
-    const verificationHandler = async () => {
-        // console.log("test")
-        // setInvalidErrror(true);
-
-        const verificationNumber = Object.values(verifyNumber).join("");
-        if (verificationNumber.length !== 4) {
-            setInvalidErrror(true);
-            return;
-        }
-        // await activation({
-        //     activation_token: token,
-        //     activation_code: verificationNumber,
-        // })
-        // setOpen(false);
-    };
 
     const handleInputChange = (index: number, value: string) => {
 
@@ -94,17 +86,18 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
     };
 
     const handleToggle = () => {
-        setOpen(!open)
+        setOpen(!open);
+        setRoute("Login");
     };
 
-
-
+    // forgot password schema
     const form = useForm<UserFormDataEmail>({
         resolver: zodResolver(formSchemaEmail),
         defaultValues: {
             email: "",
         },
     })
+    // change password schema
     const formPassword = useForm<UserFormDataPassword>({
         resolver: zodResolver(formSchemaPassword),
         defaultValues: {
@@ -112,27 +105,68 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
         },
     })
 
-    function onSubmit(values: z.infer<typeof formSchemaEmail>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
-        setRoute("Register");
+    async function onSubmit(values: z.infer<typeof formSchemaEmail>) {
+        await forgotPassord(values);
 
     }
+    async function onSubmitPassword(values: z.infer<typeof formSchemaPassword>) {
+        // check otp varification
+        const verificationNumber = Object.values(verifyNumber).join("");
+        if (verificationNumber.length !== 4) {
+            setInvalidErrror(true);
+            return;
+        }
 
-    function onSubmitPassword(values: z.infer<typeof formSchemaPassword>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
-        setRoute("Register");
-
+        await changePassword({
+            activation_code: verificationNumber,
+            activation_token: token,
+            newPassword: values.password
+        })
     }
+
+    useEffect(() => {
+        if (forgotSuccess) {
+            // setOpen(false);
+            toast.success("OTP sent on your email.");
+        }
+        if (forgotError) {
+            if ("data" in forgotError) {
+                const errorData = forgotError as any;
+                toast.error(errorData.data.message);
+            } else {
+                console.log("[FORGOT_ERROR]:", forgotError)
+            }
+        }
+    }, [forgotSuccess, forgotError]);
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success("Password changed successfully.");
+            setRoute("Login");
+        }
+        if (error) {
+            if ("data" in error) {
+                const errorData = error as any;
+                if (errorData.data.message === "Invalid activation code") {
+                    setInvalidErrror(true);
+                    toast.error(errorData.data.message);
+                } else {
+                    toast.error("something went wrong.Please try again...");
+                }
+            } else {
+                console.log("[CHANGE_PASSWORD_ERROR]:", error)
+            }
+        }
+
+    }, [isSuccess, error]);
+
+
     return (
         <Dialog open={open}>
             <DialogTrigger className="hidden" onClick={handleToggle}></DialogTrigger>
             <DialogContent>
                 <div className="flex justify-between items-center ">
-                    <DialogTitle className="ml-[40%] font-bold text-2xl p-1">Verification</DialogTitle>
+                    <DialogTitle className="ml-[40%] font-bold text-2xl p-1">Forgot Password</DialogTitle>
                     <Button variant={"ghost"} onClick={handleToggle}><X /></Button>
                 </div>
                 <DialogHeader>
@@ -147,27 +181,25 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
                                             <FormItem className="text-start">
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="Enter your Email..." {...field} />
+                                                    <Input disabled={forgotSuccess} placeholder="Enter your Email..." {...field} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                     <div className="flex items-center  w-full justify-center">
-                                        {/* disbale the button on success of email found and god the otpm */}
-                                        <Button className="w-[80%] sm:w-full" type="submit"  >Submit</Button>
+                                        {forgotLoading ? <ButtonLoading /> : <Button disabled={forgotSuccess} className="w-[80%] sm:w-full" type="submit"  >Submit</Button>}
                                     </div>
                                 </form>
                             </div>
                         </Form>
                     </div>
-
                     {/* OTP */}
                     {/* show this section only on success of code gette it successfully */}
-                    <div className="">
+                    {forgotSuccess && <div className="">
                         <div className="flex flex-col justify-center mt-5">
                             <p className="text-wrap pr-4 text-center">Check your Email inbox as spam for code send to email</p>
-                            <TvIcon className="self-center w-12 h-12 my-4" />
+                            <ShieldCheck className="self-center w-12 h-12 my-4 text-green-400" />
                         </div>
                         <div className="flex container gap-1 items-center justify-center">
                             {Object.keys(verifyNumber).map((key, index) => (
@@ -184,37 +216,31 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
                             ))}
                         </div>
                         <div>
+                            <Form {...formPassword}>
+                                <div className="my-4">
+                                    <form onSubmit={formPassword.handleSubmit(onSubmitPassword)} className="space-y-8">
+                                        <FormField
+                                            control={formPassword.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem className="text-start">
+                                                    <FormLabel>Password New Password</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="password" placeholder="Enter your password..." {...field} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <div className="flex items-center  w-full justify-center">
+                                            {isLoading ? <ButtonLoading /> : <Button className="w-[80%] sm:w-full" type="submit"  >Submit</Button>}
+                                        </div>
+                                    </form>
+                                </div>
+                            </Form>
                         </div>
-                        <div className="flex items-center w-full justify-center">
-                            <Button className="sm:w-full w-[80%] mt-4" type="submit" onClick={verificationHandler} >Verify Your code</Button>
-                        </div>
-                    </div>
+                    </div>}
 
-                    <div>
-                        <Form {...formPassword}>
-                            <div>
-                                <form onSubmit={formPassword.handleSubmit(onSubmitPassword)} className="space-y-8">
-                                    <FormField
-
-                                        control={formPassword.control}
-                                        name="password"
-                                        render={({ field }) => (
-                                            <FormItem className="text-start">
-                                                <FormLabel>Password</FormLabel>
-                                                <FormControl>
-                                                    <Input type="password" placeholder="Enter your password..." {...field} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <div className="flex items-center w-full justify-center">
-                                        <Button className="w-[80%] sm:w-full" type="submit"  >Sign Up</Button>
-                                    </div>
-                                </form>
-                            </div>
-                        </Form>
-                    </div>
                 </DialogHeader>
             </DialogContent>
         </Dialog>
