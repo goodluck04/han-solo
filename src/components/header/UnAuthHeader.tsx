@@ -2,11 +2,11 @@ import { Bell, Swords } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { MobileNav } from './MobileNav'
-import { Button } from './../ui/button'
-import LoginModel from './../auth/LoginModel'
-import RegisterModel from './../auth/RegisterModel'
-import VerificationModel from './../auth/ActivationModel'
-import ForgotPasswordModel from './../auth/ForgotPasswordModel'
+import { Button } from '../ui/button'
+import LoginModel from '../auth/LoginModel'
+import RegisterModel from '../auth/RegisterModel'
+import VerificationModel from '../auth/ActivationModel'
+import ForgotPasswordModel from '../auth/ForgotPasswordModel'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import AvatarHolder from '../AvatarHolder'
@@ -20,15 +20,31 @@ import { useUserInfoQuery } from '@/redux/features/user/userApi'
 type Props = {
     // setOpen: (open: boolean) => void;
     // open: boolean;
+    refetch: any
 }
 
 export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
 
-export default function Header({ }: Props) {
+export default function UnAuthHeader({ refetch }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
     const [logout, { }] = useLogoutMutation();
-    
+    const { data: OAuthData } = useSession();
+    const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess, error: loginError }] = useSocialAuthMutation();
+    const [toastDisplayed, setToastDisplayed] = useState(false);
+
+    useEffect(() => {
+        if (OAuthData) {
+            socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
+        }
+        if (socialAuthSuccess && !toastDisplayed) {
+            // signOut()
+            setToastDisplayed(true);
+            toast.success("Login Successfully");
+            refetch();
+        }
+    }, [OAuthData, socialAuthSuccess, toastDisplayed, refetch]);
+
 
     return (
         <div className='w-full relative border-b h-12'>
@@ -45,14 +61,13 @@ export default function Header({ }: Props) {
                 </div>
                 <div className='h-full hidden md:flex items-center gap-6'>
                     <div className='h-full hidden md:flex items-center gap-6 relative'>
-                        <div className='relative'>
+                        {/* <div className='relative'>
                             <Button size={'icon'} className='p-1.5' variant={"ghost"} ><Bell /></Button>
                             <Badge variant="secondary" className="absolute -top-0.5 -right-1 px-1.5  bg-green-400">4</Badge>
-                        </div>
+                        </div> */}
                     </div>
                     <ThemeToggle />
-                    <Button onClick={() => logout({})}>Logout</Button>
-                    <AvatarHolder isHeader />
+                    <Button size={'sm'} className={`md:mr-1`} onClick={() => setOpen(true)} variant={'default'}>{"Login"}</Button>
                 </div>
                 <div className='flex items-center mr-2 md:hidden'>
                     <MobileNav setOpen={setOpen} />

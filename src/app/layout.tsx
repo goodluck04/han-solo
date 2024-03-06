@@ -6,8 +6,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils"
 import { ReduxProvider } from "./ReduxProvider";
 import { Toaster } from "@/components/ui/sonner";
-import Header from "@/components/header/Header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionProvider } from "next-auth/react"
 
 export const fontSans = FontSans({
   subsets: ["latin"],
@@ -32,18 +32,20 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <ReduxProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Header />
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </ReduxProvider>
+        <SessionProvider>
+          <ReduxProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </ReduxProvider>
+        </SessionProvider>
       </body>
     </html>
   );

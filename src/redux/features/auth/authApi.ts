@@ -1,4 +1,5 @@
 import { baseApi } from "../api/apiSlice";
+import { signOut } from "next-auth/react";
 
 // import { apiSlice } from "../api/apiSlice";
 import { setCredentials, userLoggedOut } from "./authSlice";
@@ -51,12 +52,21 @@ export const authApi = baseApi.injectEndpoints({
         body: { activation_code, activation_token },
       }),
     }),
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
         body: { ...credentials },
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          // console.log(data)
+          dispatch(setCredentials({ accessToken: data }));
+        } catch (error) {
+          console.log("[SOCIAL_AUTH_API_ERROR]:", error);
+        }
+      },
     }),
     logout: builder.mutation({
       query: () => ({
@@ -67,6 +77,7 @@ export const authApi = baseApi.injectEndpoints({
         try {
           const { data } = await queryFulfilled;
           console.log(data);
+          await signOut();
           dispatch(userLoggedOut());
           setTimeout(() => {
             dispatch(baseApi.util.resetApiState());
@@ -116,6 +127,21 @@ export const authApi = baseApi.injectEndpoints({
         body: { activation_code, activation_token, newPassword },
       }),
     }),
+    socialAuth: builder.mutation({
+      query: ({ email, name, avatar }) => ({
+        url: "/auth/social-auth",
+        method: "POST",
+        body: { email, name, avatar },
+      }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setCredentials({ accessToken: data }));
+        } catch (error) {
+          console.log("[SOCIAL_AUTH_API_ERROR]:", error);
+        }
+      },
+    }),
   }),
 });
 
@@ -126,4 +152,5 @@ export const {
   useVerificationMutation,
   useForgotPasswordMutation,
   useChangePasswordMutation,
+  useSocialAuthMutation,
 } = authApi;
