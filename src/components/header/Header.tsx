@@ -18,8 +18,7 @@ import { toast } from 'sonner'
 import { useUserInfoQuery } from '@/redux/features/user/userApi'
 
 type Props = {
-    // setOpen: (open: boolean) => void;
-    // open: boolean;
+    
 }
 
 export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
@@ -28,6 +27,7 @@ export default function Header({ }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
     const [logout, { }] = useLogoutMutation();
+    
     
 
     return (
@@ -43,7 +43,7 @@ export default function Header({ }: Props) {
                         <Link href="/"><Button variant={'ghost'} size={'sm'}>B-Schools</Button></Link>
                     </div>
                 </div>
-                <div className='h-full hidden md:flex items-center gap-6'>
+                <div className='h-full hidden md:flex items-center gap-6 mr-2'>
                     <div className='h-full hidden md:flex items-center gap-6 relative'>
                         <div className='relative'>
                             <Button size={'icon'} className='p-1.5' variant={"ghost"} ><Bell /></Button>
@@ -55,7 +55,7 @@ export default function Header({ }: Props) {
                     <AvatarHolder isHeader />
                 </div>
                 <div className='flex items-center mr-2 md:hidden'>
-                    <MobileNav setOpen={setOpen} />
+                    <MobileNav logout={logout} isAuth setOpen={setOpen} />
                 </div>
             </div>
             <div>

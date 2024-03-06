@@ -21,11 +21,13 @@ import AvatarHolder from "../AvatarHolder"
 
 type Props = {
     setOpen: (open: boolean) => void;
+    isAuth?:boolean;
+    logout?:any;
 }
 
-export function MobileNav({ setOpen }: Props) {
+export function MobileNav({ setOpen,isAuth,logout }: Props) {
     // const [open, setOpen] = useState(false);
-    const user = useSelector((action: RootState) => action.auth.user);
+    const { token } = useSelector((state: RootState) => state.auth);
 
     return (
         <Sheet>
@@ -42,10 +44,10 @@ export function MobileNav({ setOpen }: Props) {
                             <Badge variant="secondary" className="absolute -top-0.5 -right-1 px-1.5  bg-green-400">4</Badge>
                         </div>
                         <ThemeToggle />
-                        <Button size={'sm'} className={`${user && "rounded-full w-9 h-9"} md:mr-1`} onClick={() => setOpen(true)} variant={'default'}>{user ? <AvatarHolder isHeader /> : "Login"}</Button>
-                        {/* <SheetClose asChild className="">
-                            <Button variant="ghost" type="submit">Log Out</Button>
-                        </SheetClose> */}
+                        <Button size={'sm'} className={`${token && "rounded-full w-9 h-9"} md:mr-1`} onClick={() => token? null : setOpen(true)} variant={'default'}>{token ? <AvatarHolder isHeader /> : "Login"}</Button>
+                        {isAuth && <SheetClose asChild className="">
+                            <Button variant="ghost" type="submit" onClick={() => logout()}>Log Out</Button>
+                        </SheetClose> }
                     </div>
                     <div className='h-full sm:hidden flex flex-col gap-1 items-start text-start'>
                         <Link className='' href="/"><Button variant={'ghost'} size={'sm'}>Home</Button></Link>
