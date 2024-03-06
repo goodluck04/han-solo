@@ -25,6 +25,7 @@ type Props = {
     logout?:any;
 }
 
+
 export function MobileNav({ setOpen,isAuth,logout }: Props) {
     // const [open, setOpen] = useState(false);
     const { token } = useSelector((state: RootState) => state.auth);
