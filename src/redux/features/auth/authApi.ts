@@ -41,7 +41,7 @@ export const authApi = baseApi.injectEndpoints({
           // console.log(data);
           dispatch(setTempToken({ temp_token: data.activationToken }));
         } catch (error) {
-          console.log("[REGISTER_API_ERROR]:", error);
+          // console.log("[REGISTER_API_ERROR]:", error);
         }
       },
     }),
@@ -64,7 +64,7 @@ export const authApi = baseApi.injectEndpoints({
           // console.log(data)
           dispatch(setCredentials({ accessToken: data }));
         } catch (error) {
-          console.log("[SOCIAL_AUTH_API_ERROR]:", error);
+          // console.log("[LOGIN_AUTH_API_ERROR]:", error);
         }
       },
     }),
@@ -83,7 +83,7 @@ export const authApi = baseApi.injectEndpoints({
             dispatch(baseApi.util.resetApiState());
           }, 1000);
         } catch (error) {
-          console.log("[LOGOUT_API_ERROR]:", error);
+          // console.log("[LOGOUT_API_ERROR]:", error);
         }
       },
     }),
@@ -100,7 +100,7 @@ export const authApi = baseApi.injectEndpoints({
           const { accessToken } = data;
           dispatch(setCredentials({ accessToken }));
         } catch (error) {
-          console.log("[REFRESH_TOKEN_API_ERROR]:", error);
+          // console.log("[REFRESH_TOKEN_API_ERROR]:", error);
         }
       },
     }),
@@ -115,7 +115,7 @@ export const authApi = baseApi.injectEndpoints({
           const { data } = await queryFulfilled;
           dispatch(setTempToken({ temp_token: data.activationToken }));
         } catch (error) {
-          console.log("[FORGOT_PASSWORD_API_ERROR]:", error);
+          // console.log("[FORGOT_PASSWORD_API_ERROR]:", error);
         }
       },
     }),
@@ -137,7 +137,7 @@ export const authApi = baseApi.injectEndpoints({
           const { data } = await queryFulfilled;
           dispatch(setCredentials({ accessToken: data }));
         } catch (error) {
-          console.log("[SOCIAL_AUTH_API_ERROR]:", error);
+          // console.log("[SOCIAL_AUTH_API_ERROR]:", error);
         }
       },
     }),

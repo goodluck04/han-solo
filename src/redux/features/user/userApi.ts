@@ -7,15 +7,15 @@ export const userApi = baseApi.injectEndpoints({
         url: "/user/me",
         method: "GET",
       }),
-      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          // console.log(data);
-          // dispatch(userLoggedIn({ user: data. }));
-        } catch (error) {
-          console.log("[USER_INFO_API_ERROR]:", error);
-        }
-      },
+      // async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+      //   try {
+      //     const { data } = await queryFulfilled;
+      //     // console.log(data);
+      //     // dispatch(userLoggedIn({ user: data. }));
+      //   } catch (error) {
+      //     // console.log("[USER_INFO_API_ERROR]:", error);
+      //   }
+      // },
     }),
   }),
 });
