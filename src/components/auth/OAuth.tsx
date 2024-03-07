@@ -17,40 +17,44 @@ import { signIn } from 'next-auth/react';
 
 type Props = {
   setOpen: (open: boolean) => void;
+  setAuth: (auth: boolean) => void;
 }
 
-export default function OAuth({ }: Props) {
+export default function OAuth({ setAuth }: Props) {
   // const dispatch = useDispatch();
   //   const navigate = useNavigate();
 
- 
+
 
   const handleGoogleClick = async () => {
-   
+    signIn("google")
+    setAuth(true)
+
   };
 
   const handleGitHubClick = async () => {
-   
+    signIn("github");
+    setAuth(true)
   };
 
- 
-    // Handle the redirect when the component mounts
-    // const handleGoogleClick = async () => {
-    //   try {
-    //     // Initiate the sign-in process with GitHub provider
-    //     await signInWithRedirect(auth, googleProvider);
-    //   } catch (error) {
-    //     console.error("Error during sign-in with redirect:", error);
-    //   }
-    // };
-    // const handleGitHubClick = async () => {
-    //   try {
-    //     // Initiate the sign-in process with GitHub provider
-    //     await signInWithRedirect(auth, githubProvider);
-    //   } catch (error) {
-    //     console.error("Error during sign-in with redirect:", error);
-    //   }
-    // };
+
+  // Handle the redirect when the component mounts
+  // const handleGoogleClick = async () => {
+  //   try {
+  //     // Initiate the sign-in process with GitHub provider
+  //     await signInWithRedirect(auth, googleProvider);
+  //   } catch (error) {
+  //     console.error("Error during sign-in with redirect:", error);
+  //   }
+  // };
+  // const handleGitHubClick = async () => {
+  //   try {
+  //     // Initiate the sign-in process with GitHub provider
+  //     await signInWithRedirect(auth, githubProvider);
+  //   } catch (error) {
+  //     console.error("Error during sign-in with redirect:", error);
+  //   }
+  // };
 
 
   return (
@@ -59,13 +63,13 @@ export default function OAuth({ }: Props) {
       <div className="flex justify-center my-6 gap-8 ">
         <FcGoogle
           // onClick={handleGoogleClick}
-          onClick={() => signIn("google")}
+          onClick={handleGoogleClick}
           size={30}
           className="cursor-pointer mr-2 hover:opacity-70"
         />
         <AiFillGithub
           // onClick={handleGitHubClick}
-          onClick={() => signIn("github")}
+          onClick={handleGitHubClick}
           size={30}
           className="cursor-pointer ml-2 hover:opacity-70"
         />

@@ -20,6 +20,7 @@ type Props = {
     route: string;
     setRoute: (route: RouteType) => void;
     setOpen: (open: boolean) => void;
+    setAuth: (auth:boolean)=>void;
 };
 
 const formSchema = z.object({
@@ -34,7 +35,7 @@ const formSchema = z.object({
 type UserFormData = z.infer<typeof formSchema>;
 
 
-export default function LoginModel({ open, setRoute, setOpen }: Props) {
+export default function LoginModel({ open, setRoute, setOpen, setAuth }: Props) {
 
     const [login, { isLoading, data, error, isSuccess }] = useLoginMutation();
 
@@ -133,7 +134,7 @@ export default function LoginModel({ open, setRoute, setOpen }: Props) {
                                                 onClick={() => signIn("github")}
                                                 size={30} className="cursor-pointer ml-2 hover:opacity-70" />
                                     </div> */}
-                                    <OAuth setOpen={setOpen} />
+                                    <OAuth setAuth={setAuth} setOpen={setOpen} />
                                     <div className="text-end -mb-8 text-red-500">
                                         <p onClick={registerRedirectHandler} className="hover:underline cursor-pointer">Don&rsquo;t have an Account ?</p>
                                     </div>

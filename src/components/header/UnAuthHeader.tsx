@@ -23,7 +23,7 @@ type Props = {
     currentUser: any
 }
 
-export type RouteType =  "ForgetPassword" | "Varification" | "Login" | "Register";
+export type RouteType = "ForgetPassword" | "Varification" | "Login" | "Register";
 
 export default function UnAuthHeader({ currentUser }: Props) {
     const [open, setOpen] = useState(false);
@@ -31,16 +31,19 @@ export default function UnAuthHeader({ currentUser }: Props) {
     const [logout, { }] = useLogoutMutation();
     const { data: OAuthData } = useSession();
     const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess, error: loginError }] = useSocialAuthMutation();
-
+    const [auth, setAuth] = useState(false);
+    // console.log(OAuthData)
+    // console.log(auth)
     useEffect(() => {
-        if (OAuthData?.user!!) {
+        if (OAuthData && auth) {
             socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
         }
         if (socialAuthSuccess) {
             // signOut()
             toast.success("Login Successfully");
+            setAuth(false);
         }
-    }, [OAuthData, socialAuthSuccess,]);
+    }, [OAuthData, socialAuthSuccess, auth, setAuth]);
 
 
     return (
@@ -72,7 +75,7 @@ export default function UnAuthHeader({ currentUser }: Props) {
             </div>
             <div>
 
-                {route === "Login" && open && <LoginModel open={open} setRoute={setRoute} route={route} setOpen={setOpen} />}
+                {route === "Login" && open && <LoginModel setAuth={setAuth} open={open} setRoute={setRoute} route={route} setOpen={setOpen} />}
                 {route === "Register" && open && <RegisterModel open={open} setRoute={setRoute} route={route} setOpen={setOpen} />}
                 {route === "Varification" && open && <VerificationModel open={open} setRoute={setRoute} route={route} setOpen={setOpen} />}
                 {route === "ForgetPassword" && open && <ForgotPasswordModel open={open} setRoute={setRoute} route={route} setOpen={setOpen} />}
