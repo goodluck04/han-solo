@@ -13,6 +13,8 @@ import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { ButtonLoading } from "../LoadingButton";
+import { useDispatch } from "react-redux";
+import OAuth from "./OAuth";
 
 type Props = {
     open: boolean;
@@ -39,6 +41,7 @@ type UserFormData = z.infer<typeof formSchema>;
 export default function RegisterModel({ open, setRoute, setOpen }: Props) {
 
     const [register, { isSuccess, error, isLoading }] = useRegisterMutation();
+    const dispatch = useDispatch();
 
     const handleToggle = () => {
         setOpen(!open)
@@ -55,7 +58,6 @@ export default function RegisterModel({ open, setRoute, setOpen }: Props) {
     })
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        console.log(values)
         await register(values);
     }
 
@@ -69,12 +71,12 @@ export default function RegisterModel({ open, setRoute, setOpen }: Props) {
         if (isSuccess) {
             toast.success("Registration successful");
             setRoute("Varification");
+
         }
         if (error) {
             if ("data" in error) {
                 const errorData = error as any;
-                console.log(errorData)
-                toast.error(errorData.data.message);
+                toast.error(errorData.data.message || "something went wrong.");
             } else {
                 console.log("[REGISTER_ERROR]:", error);
             }
@@ -134,11 +136,16 @@ export default function RegisterModel({ open, setRoute, setOpen }: Props) {
                                     )}
                                 />
                                 <div className="">
-                                    <div className="font-bold text-center text-slate-500 -mt-6 underline">OR</div>
-                                    <div className="flex justify-center my-2 gap-12">
-                                        <AvatarHolder src="https://github.com/shadcn.png" alt="G+" />
-                                        <AvatarHolder src="https://github.com/shadcn.png" alt="GH" />
-                                    </div>
+                                <div className="font-bold text-center text-slate-500  underline">Or join with</div>
+                                    {/* <div className="flex justify-center my-6 gap-8 ">
+                                            <FcGoogle
+                                                onClick={() => signIn("google")}
+                                                size={30} className="cursor-pointer mr-2 hover:opacity-70" />
+                                            <AiFillGithub
+                                                onClick={() => signIn("github")}
+                                                size={30} className="cursor-pointer ml-2 hover:opacity-70" />
+                                    </div> */}
+                                    <OAuth  setOpen={setOpen} />
                                     <div className="text-end -mb-7 text-red-500">
                                         <p className="hover:underline cursor-pointer" onClick={loginRedirectHandler}>Already have an Account ?</p>
                                     </div>

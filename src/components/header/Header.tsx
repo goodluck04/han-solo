@@ -16,8 +16,9 @@ import { signOut, useSession } from 'next-auth/react'
 import { useLogoutMutation, useSocialAuthMutation } from '@/redux/features/auth/authApi'
 import { toast } from 'sonner'
 import { useUserInfoQuery } from '@/redux/features/user/userApi'
+import { ButtonLoading } from '../LoadingButton'
 
-type Props = { 
+type Props = {
 }
 
 export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
@@ -25,9 +26,9 @@ export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "
 export default function Header({ }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
-    const [logout, { }] = useLogoutMutation();
-    
-    
+    const [logout, { isLoading: logoutLoading }] = useLogoutMutation();
+
+
 
     return (
         <div className='w-full relative border-b h-12'>
@@ -50,7 +51,8 @@ export default function Header({ }: Props) {
                         </div>
                     </div>
                     <ThemeToggle />
-                    <Button onClick={() => logout({})}>Logout</Button>
+                    {logoutLoading ? <ButtonLoading /> : <Button onClick={() => logout({})}>Logout</Button>}
+
                     <AvatarHolder isHeader />
                 </div>
                 <div className='flex items-center mr-2 md:hidden'>

@@ -5,10 +5,11 @@ import { ShieldCheck, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../CustomDialog";
 import { RouteType } from "../header/Header";
 import { useVerificationMutation } from "@/redux/features/auth/authApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { ButtonLoading } from "../LoadingButton";
+import { resetTempToken } from "@/redux/features/auth/authSlice";
 
 type Props = {
     open: boolean;
@@ -28,7 +29,8 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
 
     const [invalidError, setInvalidErrror] = useState(false);
     const [verification, { isLoading, isSuccess, error }] = useVerificationMutation()
-    const token = useSelector((action: RootState) => action.auth.token);
+    const { temp_token } = useSelector((action: RootState) => action.auth);
+    const dispatch = useDispatch();
 
     const inputRef = [
         useRef<HTMLInputElement>(null),
@@ -42,7 +44,7 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
         2: "",
         3: "",
     })
-
+    console.log("activation", temp_token)
     const verificationHandler = async () => {
         const verificationNumber = Object.values(verifyNumber).join("");
         if (verificationNumber.length !== 4) {
@@ -50,7 +52,7 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
             return;
         }
         await verification({
-            activation_token: token,
+            activation_token: temp_token,
             activation_code: verificationNumber,
         })
     };
@@ -76,13 +78,14 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
     useEffect(() => {
         if (isSuccess) {
             toast.success("Account activated successfully");
+            dispatch(resetTempToken());
             setRoute("Login");
         };
         if (error) {
             if ("data" in error) {
                 const errorData = error as any;
                 setInvalidErrror(true);
-                toast.error(errorData.data.message);
+                toast.error(errorData.data.message || "Something went wrong.");
             } else {
                 console.log("[VERIFICATION_ERROR]:", error)
             }

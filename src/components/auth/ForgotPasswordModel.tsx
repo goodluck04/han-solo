@@ -12,10 +12,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { RouteType } from "../header/Header";
 import { useChangePasswordMutation, useForgotPasswordMutation } from "@/redux/features/auth/authApi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import { ButtonLoading } from "../LoadingButton";
+import { resetTempToken } from "@/redux/features/auth/authSlice";
 
 type Props = {
     open: boolean;
@@ -54,10 +55,11 @@ type UserFormDataPassword = z.infer<typeof formSchemaPassword>;
 
 export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: Props) {
 
+    const dispatch = useDispatch();
     const [invalidError, setInvalidErrror] = useState(false);
     const [forgotPassord, { isLoading: forgotLoading, isSuccess: forgotSuccess, data: forgotData, error: forgotError }] = useForgotPasswordMutation();
     const [changePassword, { isLoading, isSuccess, data, error }] = useChangePasswordMutation();
-    const { token } = useSelector((state: RootState) => state.auth)
+    const { temp_token } = useSelector((state: RootState) => state.auth)
     const inputRef = [
         useRef<HTMLInputElement>(null),
         useRef<HTMLInputElement>(null),
@@ -119,7 +121,7 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
 
         await changePassword({
             activation_code: verificationNumber,
-            activation_token: token,
+            activation_token: temp_token,
             newPassword: values.password
         })
     }
@@ -132,7 +134,7 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
         if (forgotError) {
             if ("data" in forgotError) {
                 const errorData = forgotError as any;
-                toast.error(errorData.data.message);
+                toast.error(errorData.data.message || "Something went wrong");
             } else {
                 console.log("[FORGOT_ERROR]:", forgotError)
             }
@@ -142,6 +144,7 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
     useEffect(() => {
         if (isSuccess) {
             toast.success("Password changed successfully.");
+            dispatch(resetTempToken())
             setRoute("Login");
         }
         if (error) {
@@ -149,7 +152,7 @@ export default function ForgotPasswordModel({ open, setRoute, setOpen, route }: 
                 const errorData = error as any;
                 if (errorData.data.message === "Invalid activation code") {
                     setInvalidErrror(true);
-                    toast.error(errorData.data.message);
+                    toast.error(errorData.data.message || "Something went wrong");
                 } else {
                     toast.error("something went wrong.Please try again...");
                 }

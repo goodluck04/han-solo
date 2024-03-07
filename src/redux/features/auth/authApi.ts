@@ -2,7 +2,7 @@ import { baseApi } from "../api/apiSlice";
 import { signOut } from "next-auth/react";
 
 // import { apiSlice } from "../api/apiSlice";
-import { setCredentials, userLoggedOut } from "./authSlice";
+import { setCredentials, setTempToken, userLoggedOut } from "./authSlice";
 
 type RegistrationResponse = {
   data: {
@@ -38,8 +38,8 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
-          dispatch(setCredentials({ accessToken: data.activationToken }));
+          // console.log(data);
+          dispatch(setTempToken({ temp_token: data.activationToken }));
         } catch (error) {
           console.log("[REGISTER_API_ERROR]:", error);
         }
@@ -76,7 +76,7 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
+          // console.log(data);
           await signOut();
           dispatch(userLoggedOut());
           setTimeout(() => {
@@ -113,8 +113,7 @@ export const authApi = baseApi.injectEndpoints({
       async onQueryStarted(arg, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
-          dispatch(setCredentials({ accessToken: data.activationToken }));
+          dispatch(setTempToken({ temp_token: data.activationToken }));
         } catch (error) {
           console.log("[FORGOT_PASSWORD_API_ERROR]:", error);
         }
