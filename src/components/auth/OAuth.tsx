@@ -17,7 +17,7 @@ import { signIn } from 'next-auth/react';
 
 type Props = {
   setOpen: (open: boolean) => void;
-  setAuth: (auth: boolean) => void;
+  setAuth: (auth: boolean) => void ;
 }
 
 export default function OAuth({ setAuth }: Props) {

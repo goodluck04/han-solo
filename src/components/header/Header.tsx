@@ -17,8 +17,7 @@ import { useLogoutMutation, useSocialAuthMutation } from '@/redux/features/auth/
 import { toast } from 'sonner'
 import { useUserInfoQuery } from '@/redux/features/user/userApi'
 
-type Props = {
-    
+type Props = { 
 }
 
 export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
