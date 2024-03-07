@@ -42,18 +42,23 @@ export default function UnAuthHeader({ currentUser }: Props) {
                 avatar: OAuthData?.user?.image
             })
             .then(() => {
-                // If social authentication is successful, handle it
-                toast.success("Login Successfully");
-                setOAuthData(null); // Reset OAuthData
+                toast.success("Login Successfully")
+                signOut();
             })
             .catch((error) => {
-                // Handle authentication error
                 console.error('Social authentication error:', error);
                 toast.error('Social authentication failed');    
             });
         }
         
     }, [OAuthData]);
+    useEffect(() => {
+        if (socialAuthSuccess) {
+            toast.success('Login Successful');
+           
+        }
+    }, [socialAuthSuccess]);
+
 
 
 
