@@ -23,7 +23,7 @@ type Props = {
     currentUser: any
 }
 
-export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
+export type RouteType =  "ForgetPassword" | "Varification" | "Login" | "Register";
 
 export default function UnAuthHeader({ currentUser }: Props) {
     const [open, setOpen] = useState(false);
@@ -33,16 +33,14 @@ export default function UnAuthHeader({ currentUser }: Props) {
     const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess, error: loginError }] = useSocialAuthMutation();
 
     useEffect(() => {
-        if (!currentUser) {
-            if (OAuthData) {
-                socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
-            }
+        if (OAuthData?.user!!) {
+            socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
         }
         if (socialAuthSuccess) {
             // signOut()
             toast.success("Login Successfully");
         }
-    }, [OAuthData, socialAuthSuccess, currentUser]);
+    }, [OAuthData, socialAuthSuccess,]);
 
 
     return (
