@@ -30,8 +30,9 @@ export default function UnAuthHeader({ currentUser }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
     const [logout, { }] = useLogoutMutation();
-    const { data: OAuthData } = useSession();
+    const { data: OAuth } = useSession();
     const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess }] = useSocialAuthMutation();
+    const [OAuthData, setOAuthData] = useState(OAuth);
     useEffect(() => {
         if (OAuthData !== null) { // Check if OAuthData is not null
             socialAuth({
@@ -41,7 +42,7 @@ export default function UnAuthHeader({ currentUser }: Props) {
             })
             .then(() => {
                 toast.success("Login Successfully")
-                signOut();
+                setOAuthData(null);
             })
             .catch((error) => {
                 console.error('Social authentication error:', error);
