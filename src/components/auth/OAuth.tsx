@@ -17,10 +17,9 @@ import { signIn } from 'next-auth/react';
 
 type Props = {
   setOpen: (open: boolean) => void;
-  setAuth: (auth: boolean) => void ;
 }
 
-export default function OAuth({ setAuth }: Props) {
+export default function OAuth({ }: Props) {
   // const dispatch = useDispatch();
   //   const navigate = useNavigate();
 
@@ -28,13 +27,11 @@ export default function OAuth({ setAuth }: Props) {
 
   const handleGoogleClick = async () => {
     signIn("google")
-    setAuth(true)
 
   };
 
   const handleGitHubClick = async () => {
     signIn("github");
-    setAuth(true)
   };
 
 
