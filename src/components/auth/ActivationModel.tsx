@@ -44,7 +44,6 @@ export default function VerificationModel({ open, setRoute, setOpen, route }: Pr
         2: "",
         3: "",
     })
-    console.log("activation", temp_token)
     const verificationHandler = async () => {
         const verificationNumber = Object.values(verifyNumber).join("");
         if (verificationNumber.length !== 4) {
