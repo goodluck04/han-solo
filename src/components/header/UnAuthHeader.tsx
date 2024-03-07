@@ -30,10 +30,8 @@ export default function UnAuthHeader({ currentUser }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
     const [logout, { }] = useLogoutMutation();
-    const { data: OAuth } = useSession();
+    const { data: OAuthData } = useSession();
     const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess }] = useSocialAuthMutation();
-    const [OAuthData, setOAuthData] = useState(OAuth);
-    console.log(OAuthData)
     useEffect(() => {
         if (OAuthData !== null) { // Check if OAuthData is not null
             socialAuth({
