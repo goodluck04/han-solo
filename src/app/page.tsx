@@ -19,7 +19,7 @@ export default function Home() {
       {currentUser || token ? <>
         <Header />
         <h1>hi</h1>        
-      </> : <UnAuthHeader refetch={refetch} />
+      </> : <UnAuthHeader currentUser={currentUser} />
       }
     </div>
   );

@@ -20,30 +20,29 @@ import { useUserInfoQuery } from '@/redux/features/user/userApi'
 type Props = {
     // setOpen: (open: boolean) => void;
     // open: boolean;
-    refetch: any
+    currentUser: any
 }
 
 export type RouteType = "ForgetPassword" | "ForgetPassword" | "Varification" | "Login" | "Register";
 
-export default function UnAuthHeader({ refetch }: Props) {
+export default function UnAuthHeader({ currentUser }: Props) {
     const [open, setOpen] = useState(false);
     const [route, setRoute] = useState<RouteType>("Login");
     const [logout, { }] = useLogoutMutation();
     const { data: OAuthData } = useSession();
     const [socialAuth, { data: loginData, isSuccess: socialAuthSuccess, error: loginError }] = useSocialAuthMutation();
-    const [toastDisplayed, setToastDisplayed] = useState(false);
 
     useEffect(() => {
-        if (OAuthData) {
-            socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
+        if (!currentUser) {
+            if (OAuthData) {
+                socialAuth({ email: OAuthData.user?.email, name: OAuthData.user?.name, avatar: OAuthData.user?.image })
+            }
         }
-        if (socialAuthSuccess && !toastDisplayed) {
+        if (socialAuthSuccess) {
             // signOut()
-            setToastDisplayed(true);
             toast.success("Login Successfully");
-            refetch();
         }
-    }, [OAuthData, socialAuthSuccess, toastDisplayed, refetch]);
+    }, [OAuthData, socialAuthSuccess, currentUser]);
 
 
     return (
