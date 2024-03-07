@@ -1,5 +1,4 @@
 import { baseApi } from "../api/apiSlice";
-import { userLoggedIn } from "../auth/authSlice";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
